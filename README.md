@@ -47,16 +47,27 @@ pip install -r requirements.txt
    - Rename to `credentials.json`
    - Move to project folder
 
-### Step 3: OpenAI Setup
+### Step 3a: OpenAI Setup
 1. Visit [OpenAI Platform](https://platform.openai.com)
 2. Create account/login
 3. Click "API Keys" → "Create new secret key"
 4. Copy key
 
+### Step 3b: HuggingFace Setup
+1. Visit [HuggingFace](https://huggingface.co)
+2. Create account/login
+3. Go to Access Tokens
+4. Click "Create new token"
+5. In User Permissions, select Inference->"Make calls to the serverless inference API"
+6. Click "Create"
+7. Copy key
+
 ### Step 4: Environment Setup
 Create `.env` file:
 ```
+TYPE=OPENAI or HUGGINGFACE
 OPENAI_API_KEY=your-openai-key
+INFERENCE_API_KEY=your-huggingface-key
 SUMMARY_EMAIL=your-email@example.com
 ```
 
