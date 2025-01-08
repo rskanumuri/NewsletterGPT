@@ -77,8 +77,8 @@ def send_summary_email(service, summaries):
     date_str = datetime.now().strftime('%Y-%m-%d')
     email_content = f"Newsletter Summaries for {date_str}\n\n"
     
-    for sender, summary in summaries.items():
-        email_content += f"\nFrom {sender}:\n{summary}\n"
+    for summary in summaries:
+        email_content += f"\nFrom {summary['sender']}\n{summary['summary']}\n"
     
     message = MIMEText(email_content)
     message['to'] = os.getenv('SUMMARY_EMAIL')  # Your verified email
@@ -105,7 +105,7 @@ def main():
     service = get_gmail_service()
     print("Gmail service initialized")
     
-    summaries = {}
+    summaries = []
     
     # Process each newsletter
     for sender in NEWSLETTER_SENDERS:
@@ -114,15 +114,11 @@ def main():
         print(f"Found {len(messages)} unread messages")
         
         if messages:
-            combined_content = ""
-            for message in messages:
+            for i, message in enumerate(messages):
                 content = get_email_content(service, message['id'])
-                combined_content += content + "\n\n"
+                summary = summarize_with_gpt(content)
+                summaries.append({"sender": sender, "summary": summary})
                 archive_email(service, message['id'])
-            
-            if combined_content:
-                summary = summarize_with_gpt(combined_content)
-                summaries[sender] = summary
     
     # Send combined summary if we have any summaries
     if summaries:
