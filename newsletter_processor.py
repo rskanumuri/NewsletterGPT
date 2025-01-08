@@ -93,7 +93,7 @@ def send_summary_email(service, summaries):
     email_content = f"Newsletter Summaries for {date_str}\n\n"
     
     for summary in summaries:
-        email_content += f"\nFrom {summary['sender']}\n{summary['summary']}\n"
+        email_content += f"\nFrom {summary['sender']}:\n{summary['summary']}\n"
     
     message = MIMEText(email_content)
     message['to'] = os.getenv('SUMMARY_EMAIL')  # Your verified email

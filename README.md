@@ -7,8 +7,11 @@ AI-powered newsletter summarizer that reads your newsletters and sends concise s
 ### Prerequisites
 - Python 3.8+
 - Gmail account
-- OpenAI account
+- OpenAI account or HuggingFace account
 - Google Cloud account
+
+### NOTE:
+The HuggingFace Serverless Inference API has a free tier, but the OpenAI API does not.
 
 ### Step 1: Clone Repository
 ```bash
