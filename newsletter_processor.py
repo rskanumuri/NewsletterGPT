@@ -72,7 +72,8 @@ def get_gmail_service():
 
 def get_newsletter_emails(service, sender_email):
     query = f'from:{sender_email} is:unread'
-    results = service.users().messages().list(userId='me', q=query, maxResults=100).execute()
+    # Increase maxResults to get more emails (e.g., 5)
+    results = service.users().messages().list(userId='me', q=query, maxResults=5).execute()
     messages = results.get('messages', [])
     return messages
 
@@ -108,15 +109,11 @@ def send_summary_email(service, summaries):
     date_str = datetime.now().strftime('%Y-%m-%d')
     email_content = f"Newsletter Summaries for {date_str}\n\n"
     
-    for sender, summary in summaries.items():
-        email_content += f"\nFrom {sender}:\n{summary}\n"
-    
-    message = MIMEText(email_content)
-    message['to'] = os.getenv('SUMMARY_EMAIL')  # Your verified email
-    message['subject'] = f'Newsletter Summaries - {date_str}'
-    
-    raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode('utf-8')
-    service.users().messages().send(userId='me', body={'raw': raw_message}).execute()
+    for sender, summary_list in summaries.items():
+        email_content += f"\nFrom {sender}:\n"
+        # Add each summary as a separate bullet point
+        for i, summary in enumerate(summary_list, 1):
+            email_content += f"\nEmail {i}:\n{summary}\n"
 
 def archive_email(service, msg_id):
     service.users().messages().modify(
@@ -127,37 +124,29 @@ def archive_email(service, msg_id):
 
 def main():
     print("Starting newsletter processing...")
-    
-    # Get OpenAI API key from .env
     openai.api_key = os.getenv('OPENAI_API_KEY')
-    
-    print("Setting up Gmail service...")
-    # Initialize Gmail service
     service = get_gmail_service()
     print("Gmail service initialized")
     
     summaries = {}
     
-    # Process each newsletter
     for sender in NEWSLETTER_SENDERS:
         print(f"Checking emails from: {sender}")
         messages = get_newsletter_emails(service, sender)
         print(f"Found {len(messages)} unread messages")
         
         if messages:
-            combined_content = ""
+            # Create a list to store multiple summaries for this sender
+            sender_summaries = []
             for message in messages:
                 content = get_email_content(service, message['id'])
-                combined_content += content + "\n\n"
-                archive_email(service, message['id'])
+                if content:
+                    summary = summarize_with_gpt(content)
+                    sender_summaries.append(summary)
+                #archive_email(service, message['id'])
             
-            if combined_content:
-                summary = summarize_with_gpt(combined_content)
-                summaries[sender] = summary
-    
-    # Send combined summary if we have any summaries
-    if summaries:
-        send_summary_email(service, summaries)
+            # Store all summaries for this sender
+            summaries[sender] = sender_summaries
 
 if __name__ == '__main__':
     main()
