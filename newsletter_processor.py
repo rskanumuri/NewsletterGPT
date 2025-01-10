@@ -72,8 +72,7 @@ def get_gmail_service():
 
 def get_newsletter_emails(service, sender_email):
     query = f'from:{sender_email} is:unread'
-    # Increase maxResults to get more emails (e.g., 5)
-    results = service.users().messages().list(userId='me', q=query, maxResults=5).execute()
+    results = service.users().messages().list(userId='me', q=query, maxResults=1).execute()
     messages = results.get('messages', [])
     return messages
 
