@@ -1,15 +1,15 @@
 import os
-from dotenv import load_dotenv
-from google.oauth2.credentials import Credentials
+from dotenv import load_dotenv # type: ignore
+from google.oauth2.credentials import Credentials # type: ignore
 
 load_dotenv()  # Load environment variables
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
-from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow # type: ignore
+from google.auth.transport.requests import Request # type: ignore
+from googleapiclient.discovery import build # type: ignore
 import pickle
 import base64
 from email.mime.text import MIMEText
-import openai
+import openai # type: ignore
 from datetime import datetime
 
 SCOPES = ['https://www.googleapis.com/auth/gmail.modify']
