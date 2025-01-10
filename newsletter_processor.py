@@ -142,7 +142,7 @@ def main():
                 if content:
                     summary = summarize_with_gpt(content)
                     sender_summaries.append(summary)
-                #archive_email(service, message['id'])
+                archive_email(service, message['id'])
             
             # Store all summaries for this sender
             summaries[sender] = sender_summaries
