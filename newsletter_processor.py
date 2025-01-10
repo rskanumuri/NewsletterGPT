@@ -14,28 +14,59 @@ from datetime import datetime
 
 SCOPES = ['https://www.googleapis.com/auth/gmail.modify']
 NEWSLETTER_SENDERS = [
-    'dailyskimm@morning7.theskimm.com',
-    'newsletter@mail.tboypod.com',
-    'twosidednews@mail.beehiiv.com',
-    'thenoodlenetwork@mail.beehiiv.com'
+'satish@influencewithoutauthoritycourse.com',
+'producttalkdaily@substack.com',
+'huryn@substack.com',
+'<peteryang+product-track@substack.com',
+'noreply@newsletter.skiplevel.co',
+'runthebusiness@substack.com',
+'hello@tryexponent.com',
+'newsletters-noreply@linkedin.com',
+'info@strategyn.com',
+'teresa@producttalk.org',
+'sc@productsthatcount.com',
+'mail@digest.sharebird.com',
+'lenny@substack.com',
+'team@mindtheproduct.com',
+'aakashgupta@substack.com',
+'productmindset@substack.com',
+'cutlefish@substack.com',
+'eam@productalliance.com',
+'newsletter@techtello.com',
+'hello@mail1.reforge.com',
+'lg@substack.com',
+'annelaure@nesslabs.com',
+'team@productcollective.com'
 ]
 
 def get_gmail_service():
     creds = None
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
-            creds = pickle.load(token)
+    # If token file exists, try to load credentials from it
+    if os.path.exists('credentials.json'):
+        try:
+            creds = Credentials.from_authorized_user_file('credentials.json', SCOPES)
+        except Exception:
+            # If there's any error loading the token, set creds to None
+            creds = None
     
+    # If no valid credentials, run the OAuth flow
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
+            try:
+                creds.refresh(Request())
+            except Exception:
+                # If refresh fails, force new OAuth flow
+                flow = InstalledAppFlow.from_client_secrets_file(
+                    'credentials.json', SCOPES)
+                creds = flow.run_local_server(port=0)
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
                 'credentials.json', SCOPES)
             creds = flow.run_local_server(port=0)
         
-        with open('token.pickle', 'wb') as token:
-            pickle.dump(creds, token)
+        # Save the new credentials
+        with open('credentials.json', 'w') as token:
+            token.write(creds.to_json())
     
     return build('gmail', 'v1', credentials=creds)
 
@@ -65,7 +96,7 @@ def summarize_with_gpt(content):
     truncated_content = content[:4000] + "..." if len(content) > 4000 else content
     
     completion = openai.chat.completions.create(
-        model="gpt-4",
+        model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": "Summarize the following newsletter content in 2-3 concise bullet points."},
             {"role": "user", "content": truncated_content}
