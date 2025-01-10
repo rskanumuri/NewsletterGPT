@@ -1,15 +1,15 @@
 import os
-from dotenv import load_dotenv # type: ignore
-from google.oauth2.credentials import Credentials # type: ignore
+from dotenv import load_dotenv
+from google.oauth2.credentials import Credentials
 
 load_dotenv()  # Load environment variables
-from google_auth_oauthlib.flow import InstalledAppFlow # type: ignore
-from google.auth.transport.requests import Request # type: ignore
-from googleapiclient.discovery import build # type: ignore
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+from googleapiclient.discovery import build
 import pickle
 import base64
 from email.mime.text import MIMEText
-import openai # type: ignore
+import openai
 from datetime import datetime
 
 SCOPES = ['https://www.googleapis.com/auth/gmail.modify']
@@ -72,7 +72,7 @@ def get_gmail_service():
 
 def get_newsletter_emails(service, sender_email):
     query = f'from:{sender_email} is:unread'
-    results = service.users().messages().list(userId='me', q=query, maxResults=1).execute()
+    results = service.users().messages().list(userId='me', q=query, maxResults=100).execute()
     messages = results.get('messages', [])
     return messages
 
